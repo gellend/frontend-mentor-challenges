@@ -16,12 +16,19 @@ This is a solution to the [QR code component challenge on Frontend Mentor](https
 ### Screenshot
 
 On Desktop
+
 ![Preview](./screenshot-desktop.jpeg)
 
+---
+
 On Tablet
+
 ![Preview](./screenshot-tab.jpeg)
 
+---
+
 On Phone
+
 ![Preview](./screenshot-phone.jpeg)
 
 ### Links
