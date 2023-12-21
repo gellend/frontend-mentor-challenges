@@ -33,8 +33,8 @@ On Phone
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [GitHub](https://github.com/gellend/frontend-mentor-challenges/tree/main/qr-code-component)
+- Live Site URL: [Demo](https://gellend.github.io/frontend-mentor-challenges/qr-code-component/)
 
 ## My process
 
