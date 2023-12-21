@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./images/favicon-32x32.png"
+    />
+
+    <title>Frontend Mentor | QR code component</title>
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Outfit", sans-serif;
+      }
+      .attribution {
+        font-size: 11px;
+        text-align: center;
+      }
+      .attribution a {
+        color: hsl(228, 45%, 44%);
+      }
+    </style>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- tailwind custom -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              white: "hsl(0, 0%, 100%)",
+              "light-gray": "hsl(212, 45%, 89%)",
+              "grayish-blue": "hsl(220, 15%, 55%)",
+              "dark-blue": "hsl(218, 44%, 22%)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <main
+      class="h-screen relative flex justify-center items-center bg-light-gray"
+    >
+      <div class="flex justify-center items-center">
+        <!-- Card -->
+        <div
+          class="flex flex-col w-72 h-full bg-white p-4 rounded-md drop-shadow-lg"
+        >
+          <img
+            src="images/image-qr-code.png"
+            alt="QR Code"
+            class="rounded-md"
+          />
+          <h2 class="text-xl font-semibold text-center my-4">
+            Improve your front-end skills by building projects
+          </h2>
+          <p class="text-center text-sm text-grayish-blue mb-2">
+            Scan the QR code to visit Frontend Mentor and take your coding
+            skills to the next level
+          </p>
+        </div>
+      </div>
+
+      <div class="attribution absolute bottom-4 inset-x-0">
+        Challenge by
+        <a href="https://www.frontendmentor.io?ref=challenge" target="_blank"
+          >Frontend Mentor</a
+        >. Coded by <a href="https://github.com/gellend">gellend</a>.
+      </div>
+    </main>
+  </body>
+</html>
