@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./images/favicon-32x32.png"
+    />
+
+    <title>
+      Frontend Mentor | REST Countries API with color theme switcher hub
+    </title>
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Manrope", sans-serif;
+      }
+      .attribution {
+        font-size: 11px;
+        text-align: center;
+      }
+    </style>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- tailwind custom -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "light-cyan": "hsl(193, 38%, 86%)",
+              "neon-green": "hsl(150, 100%, 66%)",
+              "grayish-blue": "hsl(217, 19%, 38%)",
+              "dark-grayish-blue": "hsl(217, 19%, 24%)",
+              "dark-blue": "hsl(218, 23%, 16%)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  </head>
+  <body>
+    <!-- nav -->
+    <div
+      class="flex justify-between px-6 md:px-16 py-6 bg-white drop-shadow-md mb-8"
+    >
+      <h3>Where in the world?</h3>
+      <button>Dark Mode</button>
+    </div>
+
+    <!-- search and filter -->
+    <div class="flex flex-col md:flex-row justify-between px-6 md:px-16 gap-6">
+      <div
+        class="flex items-center bg-white drop-shadow-md px-4 py-5 rounded basis-full md:basis-2/5"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-grayish-blue"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 11a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-4-4"
+          />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search for a country..."
+          class="ml-4 border-none focus:outline-none"
+        />
+      </div>
+      <select
+        class="border-r-8 border-transparent px-4 py-5 text-sm outline outline-transparent rounded bg-white drop-shadow-md"
+      >
+        <option value="" disabled selected hidden>Filter by Region</option>
+        <option value="africa">Africa</option>
+        <option value="america">America</option>
+        <option value="asia">Asia</option>
+        <option value="europe">Europe</option>
+        <option value="oceania">Oceania</option>
+      </select>
+    </div>
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-6 md:px-16 py-6"
+      hx-get="https://restcountries.com/v3.1/all"
+      hx-trigger="load"
+    >
+      <!-- Card -->
+      <div
+        class="flex flex-col bg-white drop-shadow-md rounded overflow-hidden"
+      >
+        <img
+          src="https://restcountries.eu/data/afg.svg"
+          alt="afghanistan"
+          class="h-48 w-full object-cover"
+        />
+        <div class="p-6">
+          <h4 class="mb-4">Afghanistan</h4>
+          <p class="mb-2">
+            <span class="font-bold">Population:</span> 27657145
+          </p>
+          <p class="mb-2"><span class="font-bold">Region:</span> Asia</p>
+          <p class="mb-2"><span class="font-bold">Capital:</span> Kabul</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="attribution absolute bottom-4 inset-x-0">
+      Challenge by
+      <a href="https://www.frontendmentor.io" target="_blank">Frontend Mentor</a
+      >. Coded by <a href="https://github.com/gellend">gellend</a>.
+    </div>
+
+    <script>
+      htmx.onLoad(function (e) {
+        console.log(e);
+      });
+    </script>
+  </body>
+</html>
