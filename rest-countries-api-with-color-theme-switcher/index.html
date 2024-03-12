@@ -51,8 +51,6 @@
         },
       };
     </script>
-
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   </head>
   <body>
     <!-- nav -->
@@ -70,22 +68,14 @@
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-grayish-blue"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-search"
+          viewBox="0 0 16 16"
         >
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 11a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-4-4"
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
           />
         </svg>
         <input
@@ -106,41 +96,76 @@
       </select>
     </div>
 
+    <!-- countries -->
     <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-6 md:px-16 py-6"
-      hx-get="https://restcountries.com/v3.1/all"
-      hx-trigger="load"
-    >
-      <!-- Card -->
-      <div
-        class="flex flex-col bg-white drop-shadow-md rounded overflow-hidden"
-      >
-        <img
-          src="https://restcountries.eu/data/afg.svg"
-          alt="afghanistan"
-          class="h-48 w-full object-cover"
-        />
-        <div class="p-6">
-          <h4 class="mb-4">Afghanistan</h4>
-          <p class="mb-2">
-            <span class="font-bold">Population:</span> 27657145
-          </p>
-          <p class="mb-2"><span class="font-bold">Region:</span> Asia</p>
-          <p class="mb-2"><span class="font-bold">Capital:</span> Kabul</p>
-        </div>
-      </div>
-    </div>
+      id="countries-container"
+    ></div>
 
     <div class="attribution absolute bottom-4 inset-x-0">
       Challenge by
-      <a href="https://www.frontendmentor.io" target="_blank">Frontend Mentor</a
-      >. Coded by <a href="https://github.com/gellend">gellend</a>.
+      <a href="https://www.frontendmentor.io" target="_blank">
+        Frontend Mentor
+      </a>
+      | Coded by <a href="https://github.com/gellend"> gellend </a>
     </div>
 
     <script>
-      htmx.onLoad(function (e) {
-        console.log(e);
-      });
+      const url = "https://restcountries.com/v3.1/all";
+
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          const countriesContainer = document.getElementById(
+            "countries-container"
+          );
+
+          data.forEach((country) => {
+            const card = document.createElement("div");
+            card.classList.add(
+              "flex",
+              "flex-col",
+              "bg-white",
+              "drop-shadow-md",
+              "rounded",
+              "overflow-hidden"
+            );
+
+            const img = document.createElement("img");
+            img.src = country.flags.svg;
+            img.alt = country.name.common;
+            img.classList.add("h-48", "w-full", "object-cover");
+
+            const cardBody = document.createElement("div");
+            cardBody.classList.add("p-6");
+
+            const h4 = document.createElement("h4");
+            h4.classList.add("mb-4");
+            h4.textContent = country.name.common;
+
+            const p1 = document.createElement("p");
+            p1.classList.add("mb-2");
+            p1.innerHTML = `<span class="font-bold">Population:</span> ${country.population}`;
+
+            const p2 = document.createElement("p");
+            p2.classList.add("mb-2");
+            p2.innerHTML = `<span class="font-bold">Region:</span> ${country.region}`;
+
+            const p3 = document.createElement("p");
+            p3.classList.add("mb-2");
+            p3.innerHTML = `<span class="font-bold">Capital:</span> ${country.capital}`;
+
+            cardBody.appendChild(h4);
+            cardBody.appendChild(p1);
+            cardBody.appendChild(p2);
+            cardBody.appendChild(p3);
+
+            card.appendChild(img);
+            card.appendChild(cardBody);
+
+            countriesContainer.appendChild(card);
+          });
+        });
     </script>
   </body>
 </html>
