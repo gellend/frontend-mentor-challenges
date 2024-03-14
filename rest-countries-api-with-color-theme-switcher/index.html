@@ -35,6 +35,11 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.7/dist/cdn.min.js"
+    ></script>
+
     <!-- tailwind custom -->
     <script>
       tailwind.config = {
@@ -116,8 +121,33 @@
     <!-- countries -->
     <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-6 md:px-16 py-6"
-      id="countries-container"
-    ></div>
+      x-data="countries"
+    >
+      <template x-for="(country, index) in countries" :key="index">
+        <div class="flex flex-col bg-white shadow-md rounded overflow-hidden">
+          <img
+            :src="country.flags.png"
+            :alt="country.flags.alt"
+            class="h-48 w-full object-cover"
+          />
+          <div class="p-6">
+            <h4 class="mb-4" x-text="country.name.common"></h4>
+            <p class="mb-2">
+              <span class="font-bold">Population:</span>
+              <span x-text="formatNumber(country.population)"></span>
+            </p>
+            <p class="mb-2">
+              <span class="font-bold">Region:</span>
+              <span x-text="country.region"></span>
+            </p>
+            <p class="mb-2">
+              <span class="font-bold">Capital:</span>
+              <span x-text="country.capital"></span>
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
 
     <div class="attribution absolute bottom-4 inset-x-0">
       Challenge by
@@ -128,61 +158,22 @@
     </div>
 
     <script>
-      const url = "https://restcountries.com/v3.1/all";
+      // fetch countries
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("countries", () => ({
+          countries: [],
+          async init() {
+            this.countries = await (
+              await fetch("https://restcountries.com/v3.1/all")
+            ).json();
+          },
+        }));
+      });
 
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => {
-          const countriesContainer = document.getElementById(
-            "countries-container"
-          );
-
-          data.forEach((country) => {
-            const card = document.createElement("div");
-            card.classList.add(
-              "flex",
-              "flex-col",
-              "bg-white",
-              "drop-shadow-md",
-              "rounded",
-              "overflow-hidden"
-            );
-
-            const img = document.createElement("img");
-            img.src = country.flags.svg;
-            img.alt = country.name.common;
-            img.classList.add("h-48", "w-full", "object-cover");
-
-            const cardBody = document.createElement("div");
-            cardBody.classList.add("p-6");
-
-            const h4 = document.createElement("h4");
-            h4.classList.add("mb-4");
-            h4.textContent = country.name.common;
-
-            const p1 = document.createElement("p");
-            p1.classList.add("mb-2");
-            p1.innerHTML = `<span class="font-bold">Population:</span> ${country.population}`;
-
-            const p2 = document.createElement("p");
-            p2.classList.add("mb-2");
-            p2.innerHTML = `<span class="font-bold">Region:</span> ${country.region}`;
-
-            const p3 = document.createElement("p");
-            p3.classList.add("mb-2");
-            p3.innerHTML = `<span class="font-bold">Capital:</span> ${country.capital}`;
-
-            cardBody.appendChild(h4);
-            cardBody.appendChild(p1);
-            cardBody.appendChild(p2);
-            cardBody.appendChild(p3);
-
-            card.appendChild(img);
-            card.appendChild(cardBody);
-
-            countriesContainer.appendChild(card);
-          });
-        });
+      // format number
+      function formatNumber(number) {
+        return new Intl.NumberFormat().format(number);
+      }
     </script>
   </body>
 </html>
