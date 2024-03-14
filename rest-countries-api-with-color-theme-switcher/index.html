@@ -34,28 +34,10 @@
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.7/dist/cdn.min.js"
     ></script>
-
-    <!-- tailwind custom -->
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              "light-cyan": "hsl(193, 38%, 86%)",
-              "neon-green": "hsl(150, 100%, 66%)",
-              "grayish-blue": "hsl(217, 19%, 38%)",
-              "dark-grayish-blue": "hsl(217, 19%, 24%)",
-              "dark-blue": "hsl(218, 23%, 16%)",
-            },
-          },
-        },
-      };
-    </script>
   </head>
   <body>
     <!-- nav -->
@@ -63,7 +45,7 @@
       class="flex justify-between px-6 md:px-16 py-6 bg-white drop-shadow-md mb-8"
     >
       <h3 class="font-bold">Where in the world?</h3>
-      <div class="flex flex-row items-center">
+      <div class="flex flex-row items-center gap-x-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -149,31 +131,13 @@
       </template>
     </div>
 
-    <div class="attribution absolute bottom-4 inset-x-0">
+    <div class="attribution bg-white fixed bottom-0 inset-x-0 py-8">
       Challenge by
       <a href="https://www.frontendmentor.io" target="_blank">
-        Frontend Mentor
-      </a>
-      | Coded by <a href="https://github.com/gellend"> gellend </a>
+        Frontend Mentor </a
+      >. Coded by <a href="https://github.com/gellend"> gellend </a>
     </div>
 
-    <script>
-      // fetch countries
-      document.addEventListener("alpine:init", () => {
-        Alpine.data("countries", () => ({
-          countries: [],
-          async init() {
-            this.countries = await (
-              await fetch("https://restcountries.com/v3.1/all")
-            ).json();
-          },
-        }));
-      });
-
-      // format number
-      function formatNumber(number) {
-        return new Intl.NumberFormat().format(number);
-      }
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>
