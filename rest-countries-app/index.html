@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./images/favicon-32x32.png"
+  />
+
+  <title>Frontend Mentor | REST Countries API with color theme switcher</title>
+
+  <!-- fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;600;800&display=swap"
+      rel="stylesheet"
+  />
+
+  <!-- styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+          darkMode: 'class',
+          theme: {
+              extend: {
+                  colors: {
+                      'dark-blue-dark-element': 'hsl(209, 23%, 22%)',
+                      'very-dark-blue-dark-bg': 'hsl(207, 26%, 17%)',
+                      'very-dark-blue-light-text': 'hsl(200, 15%, 8%)',
+                      'dark-gray-light-input': 'hsl(0, 0%, 52%)',
+                      'very-light-gray-light-bg': 'hsl(0, 0%, 98%)',
+                      'white': 'hsl(0, 0%, 100%)',
+                  },
+                  fontFamily: {
+                      'nunito': ['"Nunito Sans"', 'sans-serif'],
+                  },
+              },
+          },
+      };
+  </script>
+  <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.7/dist/cdn.min.js"
+  ></script>
+</head>
+<body class="bg-very-light-gray-light-bg dark:bg-very-dark-blue-dark-bg text-very-dark-blue-light-text dark:text-white font-nunito min-h-screen" x-data="theme">
+<!-- Navigation -->
+<nav
+    class="flex justify-between px-4 sm:px-16 py-6 bg-white dark:bg-dark-blue-dark-element shadow-md mb-6 transition-colors"
+>
+  <h1 class="font-extrabold text-lg sm:text-xl">Where in the world?</h1>
+  <div @click="toggleDarkMode" class="flex flex-row items-center gap-x-2 cursor-pointer">
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-moon"
+        viewBox="0 0 16 16"
+        x-show="!darkMode"
+    >
+      <path
+          d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286z"
+      />
+    </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-brightness-high"
+        viewBox="0 0 16 16"
+        x-show="darkMode"
+    >
+      <path
+          d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
+      />
+    </svg>
+    <button class="font-semibold text-sm" x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></button>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main x-data="countries" class="px-4 sm:px-16 pb-16">
+
+  <!-- Country List View -->
+  <div id="countryList">
+    <!-- Search and filter -->
+    <div class="flex flex-col sm:flex-row justify-between gap-6 mb-8">
+      <div
+          class="flex items-center bg-white dark:bg-dark-blue-dark-element shadow-md px-6 py-4 rounded basis-full sm:basis-2/5 transition-colors"
+      >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-search text-dark-gray-light-input dark:text-white"
+            viewBox="0 0 16 16"
+        >
+          <path
+              d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
+          />
+        </svg>
+        <input
+            type="text"
+            placeholder="Search for a country..."
+            class="ml-6 bg-transparent border-none focus:outline-none w-full text-sm"
+            x-model="searchTerm"
+            @input="search"
+        />
+      </div>
+      <div class="relative basis-60">
+        <select
+            class="appearance-none border-none rounded px-6 py-4 text-sm w-full bg-white dark:bg-dark-blue-dark-element shadow-md cursor-pointer transition-colors focus:outline-none"
+            x-model="selectedRegion"
+            @change="filterByRegion(selectedRegion)"
+        >
+          <option value="" disabled selected hidden>Filter by Region</option>
+          <option value="">All Regions</option>
+          <option value="Africa">Africa</option>
+          <option value="Americas">Americas</option>
+          <option value="Asia">Asia</option>
+          <option value="Europe">Europe</option>
+          <option value="Oceania">Oceania</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-chevron-down"
+              viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading" x-show="isLoading">
+      <p>Loading countries...</p>
+    </div>
+
+    <!-- Countries grid -->
+    <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+        x-show="!isLoading"
+    >
+      <template x-for="country in filteredCountries" :key="country.cca3">
+        <div
+            class="bg-white dark:bg-dark-blue-dark-element shadow-md rounded overflow-hidden h-full hover:transform hover:translate-y-[-4px] transition-all cursor-pointer"
+            @click="showCountryDetails(country.cca3)"
+        >
+          <div class="h-48 overflow-hidden">
+            <img
+                :src="country.flags.png"
+                :alt="country.flags.alt || `Flag of ${country.name.common}`"
+                class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="p-6">
+            <h2 class="font-extrabold text-lg mb-4" x-text="country.name.common"></h2>
+            <p class="mb-1 text-sm">
+              <span class="font-semibold">Population:</span>
+              <span x-text="formatNumber(country.population)"></span>
+            </p>
+            <p class="mb-1 text-sm">
+              <span class="font-semibold">Region:</span>
+              <span x-text="country.region"></span>
+            </p>
+            <p class="mb-1 text-sm">
+              <span class="font-semibold">Capital:</span>
+              <span x-text="country.capital ? country.capital[0] : 'N/A'"></span>
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Country Detail View -->
+  <div id="countryDetail" class="hidden">
+    <button
+        @click="backToList"
+        class="flex items-center px-6 py-2 bg-white dark:bg-dark-blue-dark-element shadow-md rounded mb-16 transition-colors"
+    >
+      <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-arrow-left mr-2"
+          viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+      </svg>
+      Back
+    </button>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center" x-show="selectedCountry">
+      <div>
+        <img
+            :src="selectedCountry?.flags.svg || selectedCountry?.flags.png"
+            :alt="selectedCountry?.flags.alt || `Flag of ${selectedCountry?.name.common}`"
+            class="w-full shadow-md"
+        />
+      </div>
+
+      <div>
+        <h1 class="text-2xl font-extrabold mb-6" x-text="selectedCountry?.name.common"></h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <p class="mb-2 text-sm"><span class="font-semibold">Native Name: </span><span x-text="getNativeName(selectedCountry?.name.nativeName)"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Population: </span><span x-text="formatNumber(selectedCountry?.population)"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Region: </span><span x-text="selectedCountry?.region"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Sub Region: </span><span x-text="selectedCountry?.subregion || 'N/A'"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Capital: </span><span x-text="selectedCountry?.capital ? selectedCountry.capital[0] : 'N/A'"></span></p>
+          </div>
+
+          <div>
+            <p class="mb-2 text-sm"><span class="font-semibold">Top Level Domain: </span><span x-text="selectedCountry?.tld ? selectedCountry.tld[0] : 'N/A'"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Currencies: </span><span x-text="getCurrencies(selectedCountry?.currencies)"></span></p>
+            <p class="mb-2 text-sm"><span class="font-semibold">Languages: </span><span x-text="getLanguages(selectedCountry?.languages)"></span></p>
+          </div>
+        </div>
+
+        <div class="mt-8" x-show="borderCountries.length > 0">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p class="font-semibold mb-0 text-sm md:text-base">Border Countries:</p>
+            <div class="flex flex-wrap gap-2">
+              <template x-for="border in borderCountries" :key="border.code">
+                <button
+                    @click="showCountryDetails(border.code)"
+                    class="px-6 py-1 text-xs shadow-md bg-white dark:bg-dark-blue-dark-element transition-colors"
+                    x-text="border.name"
+                ></button>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="attribution bg-white fixed bottom-0 inset-x-0 py-8">
+      Challenge by
+      <a href="https://www.frontendmentor.io" target="_blank">
+        Frontend Mentor </a
+      >. Coded by <a href="https://github.com/gellend"> gellend </a>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

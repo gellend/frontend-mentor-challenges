@@ -1,0 +1,301 @@
+/* Main Styles */
+:root {
+    /* Light Mode */
+    --light-bg: hsl(0, 0%, 98%);
+    --light-elements: hsl(0, 0%, 100%);
+    --light-text: hsl(200, 15%, 8%);
+    --light-input: hsl(0, 0%, 52%);
+
+    /* Dark Mode */
+    --dark-bg: hsl(207, 26%, 17%);
+    --dark-elements: hsl(209, 23%, 22%);
+    --dark-text: hsl(0, 0%, 100%);
+
+    /* Font */
+    --font-family: 'Nunito Sans', sans-serif;
+    --fw-light: 300;
+    --fw-semi-bold: 600;
+    --fw-extra-bold: 800;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--light-bg);
+    color: var(--light-text);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+body.dark-mode nav,
+body.dark-mode .card,
+body.dark-mode .search-container,
+body.dark-mode .filter-container,
+body.dark-mode .back-button,
+body.dark-mode .border-button {
+    background-color: var(--dark-elements);
+    color: var(--dark-text);
+}
+
+body.dark-mode input,
+body.dark-mode select {
+    background-color: var(--dark-elements);
+    color: var(--dark-text);
+}
+
+body.dark-mode input::placeholder {
+    color: var(--dark-text);
+    opacity: 0.7;
+}
+
+/* Navigation */
+nav {
+    background-color: var(--light-elements);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+nav h1 {
+    font-weight: var(--fw-extra-bold);
+    font-size: 1.5rem;
+}
+
+.dark-mode-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-weight: var(--fw-semi-bold);
+    gap: 0.5rem;
+}
+
+/* Search and Filter */
+.search-container {
+    background-color: var(--light-elements);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s;
+}
+
+.search-container input {
+    background-color: transparent;
+    color: var(--light-text);
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-family: var(--font-family);
+    font-weight: var(--fw-light);
+}
+
+.filter-container {
+    background-color: var(--light-elements);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s;
+}
+
+.filter-container select {
+    border: none;
+    background-color: transparent;
+    color: var(--light-text);
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: var(--fw-light);
+    font-family: var(--font-family);
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+}
+
+/* Country Cards */
+.country-card {
+    background-color: var(--light-elements);
+    border-radius: 5px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+    height: 100%;
+    cursor: pointer;
+}
+
+.country-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-img {
+    height: 160px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-content h2 {
+    font-size: 1.125rem;
+    font-weight: var(--fw-extra-bold);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.card-content p {
+    margin: 0.3rem 0;
+    font-size: 0.875rem;
+}
+
+.card-content span.label {
+    font-weight: var(--fw-semi-bold);
+}
+
+/* Country Detail */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background-color: var(--light-elements);
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    transition: background-color 0.3s;
+    margin-bottom: 4rem;
+    gap: 0.5rem;
+}
+
+.country-detail-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+.country-flag {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.country-info h1 {
+    font-size: 1.75rem;
+    font-weight: var(--fw-extra-bold);
+    margin-bottom: 1.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.info-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.info-label {
+    font-weight: var(--fw-semi-bold);
+}
+
+.border-countries {
+    margin-top: 2rem;
+}
+
+.border-countries-title {
+    font-weight: var(--fw-semi-bold);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.border-countries-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.border-button {
+    background-color: var(--light-elements);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 1.5rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.border-button:hover {
+    transform: scale(1.05);
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-weight: var(--fw-semi-bold);
+}
+
+/* Helper Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Media Queries */
+@media (min-width: 640px) {
+    .detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .country-detail-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 5rem;
+        align-items: center;
+    }
+}
+
+@media (min-width: 1024px) {
+    .country-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Hide attribution on print */
+@media print {
+    .attribution {
+        display: none;
+    }
+}
+
+/* Fix font weights */
+h1, h2, h3 {
+    font-weight: var(--fw-extra-bold);
+}
+
+.attribution {
+    font-family: var(--font-family);
+    font-size: 11px;
+    text-align: center;
+    padding: 1.5rem 0;
+    background-color: var(--light-elements);
+    transition: background-color 0.3s;
+}
+
+body.dark-mode .attribution {
+    background-color: var(--dark-elements);
+}
