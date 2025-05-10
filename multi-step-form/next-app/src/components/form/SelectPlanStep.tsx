@@ -8,6 +8,7 @@ import { useFormStore } from '@/store/formStore';
 import { useEffect } from 'react'; // Removed unused useState
 import classes from '@/styles/SelectPlanStep.module.css';
 import { useMediaQuery } from '@mantine/hooks'; // Ensure this is imported
+import Image from 'next/image'; // Import next/image
 
 // Define plan details
 const PLANS = [
@@ -78,7 +79,13 @@ export default function SelectPlanStep() {
         ...(isMobile ? { width: '100%' } : { flex: 1 }),
       }}
     >
-      <img src={planOption.icon} alt={`${planOption.name} icon`} className={classes.planIcon} />
+      <Image 
+        src={planOption.icon} 
+        alt={`${planOption.name} icon`} 
+        className={classes.planIcon} 
+        width={40} // Placeholder width
+        height={40} // Placeholder height
+      />
       <Box mt={isMobile ? 0 : 'auto'} style={{ flexGrow: 1, textAlign: 'left'}} >
         <Text fw={500} style={{ color: 'hsl(213, 96%, 18%)' }}>{planOption.name}</Text>
         <Text size="sm" style={{ color: 'hsl(231, 11%, 63%)' }}>

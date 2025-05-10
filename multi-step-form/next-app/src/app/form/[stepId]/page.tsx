@@ -3,8 +3,13 @@ import YourInfoStep from '@/components/form/YourInfoStep';
 import SelectPlanStep from '@/components/form/SelectPlanStep';
 import SelectAddOnsStep from '@/components/form/SelectAddOnsStep';
 import SummaryStep from '@/components/form/SummaryStep';
+import React from 'react';
 
-export default function FormStepPage({ params }: { params: { stepId: string } }) {
+interface FormStepPageProps {
+  params: { stepId: string };
+}
+
+export default function FormStepPage({ params }: FormStepPageProps) {
   const { stepId } = params;
 
   const renderStepContent = () => {

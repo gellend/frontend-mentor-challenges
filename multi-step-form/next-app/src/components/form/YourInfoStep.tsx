@@ -27,7 +27,7 @@ export default function YourInfoStep() {
   // Synchronize form with store if store changes (e.g., user navigates back and forth)
   useEffect(() => {
     form.setValues(personalInfo);
-  }, [personalInfo, form.setValues]);
+  }, [personalInfo]);
 
 
   const handleSubmit = (values: PersonalInfoData) => {
