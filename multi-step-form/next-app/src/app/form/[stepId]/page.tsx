@@ -1,6 +1,5 @@
 // next-app/src/app/form/[stepId]/page.tsx
-// Placeholder for form step components
-const YourInfoStep = () => <div>Formulir Informasi Anda</div>;
+import YourInfoStep from '@/components/form/YourInfoStep';
 const SelectPlanStep = () => <div>Pilih Paket Langganan</div>;
 const AddOnsStep = () => <div>Pilih Tambahan</div>;
 const SummaryStep = () => <div>Ringkasan Pesanan</div>;
@@ -25,7 +24,6 @@ export default function FormStepPage({ params }: { params: { stepId: string } })
 
   return (
     <div>
-      <h2>Langkah: {stepId.replace('-', ' ').toUpperCase()}</h2>
       {renderStepContent()}
       {/* Navigation buttons will be added here later */}
     </div>
