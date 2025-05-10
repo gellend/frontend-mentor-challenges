@@ -2,8 +2,7 @@
 import YourInfoStep from '@/components/form/YourInfoStep';
 import SelectPlanStep from '@/components/form/SelectPlanStep';
 import SelectAddOnsStep from '@/components/form/SelectAddOnsStep';
-// const AddOnsStep = () => <div>Pilih Tambahan</div>;
-// const SummaryStep = () => <div>Ringkasan Pesanan</div>;
+import SummaryStep from '@/components/form/SummaryStep';
 
 export default function FormStepPage({ params }: { params: { stepId: string } }) {
   const { stepId } = params;
@@ -16,8 +15,8 @@ export default function FormStepPage({ params }: { params: { stepId: string } })
         return <SelectPlanStep />;
       case 'add-ons':
         return <SelectAddOnsStep />;
-      // case 'summary':
-      //   return <SummaryStep />;
+      case 'summary':
+        return <SummaryStep />;
       default:
         // This case might be hit if the stepId is not one of the above
         // or if it's the base '/form' route (if you had one)
