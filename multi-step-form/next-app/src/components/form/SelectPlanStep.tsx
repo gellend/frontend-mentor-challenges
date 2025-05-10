@@ -24,13 +24,12 @@ interface PlanFormValues {
 
 export default function SelectPlanStep() {
   const router = useRouter();
-  // Updated Zustand selectors
+  // Corrected Zustand selectors
   const currentPlan = useFormStore((state) => state.plan);
   const setPlan = useFormStore((state) => state.setPlan);
   const setCurrentStep = useFormStore((state) => state.setCurrentStep);
 
   const form = useForm<PlanFormValues>({
-    mode: 'uncontrolled',
     initialValues: {
       type: currentPlan.type as PlanId || null,
       billing: currentPlan.billing || 'monthly',
@@ -41,12 +40,13 @@ export default function SelectPlanStep() {
   });
 
   useEffect(() => {
-    form.setValues({
-        type: currentPlan.type as PlanId || null,
-        billing: currentPlan.billing || 'monthly',
-    });
-  }, [currentPlan, form.setValues]);
-
+    if (currentPlan.type !== form.values.type || currentPlan.billing !== form.values.billing) {
+        form.setValues({
+            type: currentPlan.type as PlanId || null,
+            billing: currentPlan.billing || 'monthly',
+        });
+    }
+  }, [currentPlan]); // Dependency array now only includes currentPlan
 
   const handleSubmit = (values: PlanFormValues) => {
     const selectedPlanDetails = PLANS.find(p => p.id === values.type);

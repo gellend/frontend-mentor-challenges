@@ -23,12 +23,10 @@ const initialPlan: PlanData = {
 };
 
 const initialAddOns: AddOnData[] = [
-  // Define your available add-ons here, e.g.:
-  // { id: 'online-service', name: 'Online service', priceMonthly: 1, priceYearly: 10, selected: false },
-  // { id: 'larger-storage', name: 'Larger storage', priceMonthly: 2, priceYearly: 20, selected: false },
-  // { id: 'custom-profile', name: 'Customizable Profile', priceMonthly: 2, priceYearly: 20, selected: false },
+  { id: 'online-service', name: 'Online service', priceMonthly: 1, priceYearly: 10, selected: false },
+  { id: 'larger-storage', name: 'Larger storage', priceMonthly: 2, priceYearly: 20, selected: false },
+  { id: 'custom-profile', name: 'Customizable profile', priceMonthly: 2, priceYearly: 20, selected: false },
 ];
-
 
 const initialState: FormData = {
   personalInfo: initialPersonalInfo,

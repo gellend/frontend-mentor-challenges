@@ -1,6 +1,7 @@
 // next-app/src/app/form/[stepId]/page.tsx
 import YourInfoStep from '@/components/form/YourInfoStep';
 import SelectPlanStep from '@/components/form/SelectPlanStep';
+import SelectAddOnsStep from '@/components/form/SelectAddOnsStep';
 // const AddOnsStep = () => <div>Pilih Tambahan</div>;
 // const SummaryStep = () => <div>Ringkasan Pesanan</div>;
 
@@ -13,8 +14,8 @@ export default function FormStepPage({ params }: { params: { stepId: string } })
         return <YourInfoStep />;
       case 'select-plan':
         return <SelectPlanStep />;
-      // case 'add-ons':
-      //   return <AddOnsStep />;
+      case 'add-ons':
+        return <SelectAddOnsStep />;
       // case 'summary':
       //   return <SummaryStep />;
       default:

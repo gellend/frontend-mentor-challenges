@@ -1,0 +1,15 @@
+/* next-app/src/styles/SelectAddOnsStep.module.css */
+.addOnCard {
+  border: 1px solid hsl(229, 24%, 87%); /* Cool gray */
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.addOnCard:hover {
+  border-color: hsl(243, 100%, 62%); /* Purple */
+}
+
+.addOnCard.active {
+  border-color: hsl(243, 100%, 62%); /* Purple */
+  background-color: hsl(218, 100%, 97%); /* Light Blue background */
+} 
