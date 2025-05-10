@@ -6,11 +6,11 @@ import SummaryStep from '@/components/form/SummaryStep';
 import React from 'react';
 
 interface FormStepPageProps {
-  params: { stepId: string };
+  params: Promise<{ stepId: string }>; // Updated to Promise
 }
 
-export default function FormStepPage({ params }: FormStepPageProps) {
-  const { stepId } = params;
+export default async function FormStepPage({ params }: FormStepPageProps) { // Made async
+  const { stepId } = await params; // Await params
 
   const renderStepContent = () => {
     switch (stepId) {
