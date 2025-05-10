@@ -1,35 +1,46 @@
+'use client';
+
 import Sidebar from '@/components/layout/Sidebar';
 import { Box, Paper } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function FormLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   return (
     <Box
       style={{
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
+        justifyContent: isMobile ? 'flex-start' : 'center',
         alignItems: 'center',
         minHeight: '100vh',
         backgroundColor: 'hsl(218, 100%, 97%)',
-        padding: '20px',
+        padding: isMobile ? '0' : '20px',
       }}
     >
+      {isMobile && <Sidebar />}
       <Paper
-        shadow="md"
-        p="md"
-        radius="md"
+        shadow={isMobile ? "none" : "md"}
+        p={isMobile ? "xl" : "md"}
+        radius={isMobile ? "md" : "md"}
         style={{
           display: 'flex',
-          maxWidth: '940px',
-          width: '100%',
+          flexDirection: isMobile ? 'column' : 'row',
+          width: isMobile ? 'calc(100% - 40px)' : '100%',
+          maxWidth: isMobile ? '500px' : '940px',
           backgroundColor: 'white',
+          marginTop: isMobile ? '-70px' : '0',
+          zIndex: 1,
+          position: 'relative',
         }}
       >
-        <Sidebar />
-        <Box style={{ flex: 1, padding: '20px 40px' }}>
+        {!isMobile && <Sidebar />}
+        <Box style={{ flex: 1, padding: isMobile ? '20px 0px' : '20px 40px' }}>
           {children}
         </Box>
       </Paper>

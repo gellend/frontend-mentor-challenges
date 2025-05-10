@@ -6,9 +6,10 @@
   cursor: pointer;
   transition: border-color 0.2s ease;
   display: flex;
-  flex-direction: column; /* Align icon and text vertically */
-  align-items: flex-start; /* Align items to the start */
-  min-height: 160px; /* Give some height */
+  flex-direction: column; /* Default for desktop: Align icon and text vertically */
+  align-items: flex-start; /* Default for desktop: Align items to the start */
+  /* min-height: 160px; */ /* Let content define height, or adjust per view */
+  justify-content: space-between; /* For desktop, push text content down if icon is at top */
 }
 
 .planCard:hover {
@@ -21,7 +22,25 @@
 }
 
 .planIcon {
-  width: 40px; /* Or your desired size */
-  height: 40px; /* Or your desired size */
-  margin-bottom: 2.5rem; /* Space between icon and text, similar to design */
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2.5rem; /* Default for desktop */
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .planCard {
+    flex-direction: row; /* Icon and text side-by-side */
+    align-items: center; /* Vertically align icon and text in the middle */
+    padding: 0.75rem 1rem; /* Adjusted padding for mobile */
+    min-height: auto; /* Reset min-height for mobile */
+    justify-content: flex-start; /* Align items to the start for row layout */
+  }
+
+  .planIcon {
+    margin-bottom: 0; /* Remove bottom margin for mobile */
+    margin-right: 1rem; /* Add right margin for spacing in mobile row layout */
+    /* width: 35px; */ /* Optionally adjust icon size for mobile */
+    /* height: 35px; */ 
+  }
 } 

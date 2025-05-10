@@ -7,6 +7,7 @@ import { useFormStore } from '@/store/formStore';
 // import { PlanData } from '@/types/form'; // Removed unused import
 import { useEffect } from 'react'; // Removed unused useState
 import classes from '@/styles/SelectPlanStep.module.css';
+import { useMediaQuery } from '@mantine/hooks'; // Ensure this is imported
 
 // Define plan details
 const PLANS = [
@@ -28,6 +29,7 @@ export default function SelectPlanStep() {
   const currentPlan = useFormStore((state) => state.plan);
   const setPlan = useFormStore((state) => state.setPlan);
   const setCurrentStep = useFormStore((state) => state.setCurrentStep);
+  const isMobile = useMediaQuery('(max-width: 768px)'); // Correctly initialize isMobile
 
   const form = useForm<PlanFormValues>({
     initialValues: {
@@ -46,7 +48,8 @@ export default function SelectPlanStep() {
             billing: currentPlan.billing || 'monthly',
         });
     }
-  }, [currentPlan]); // Dependency array now only includes currentPlan
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPlan]); // form.setValues was removed as per previous successful edit, keeping it that way
 
   const handleSubmit = (values: PlanFormValues) => {
     const selectedPlanDetails = PLANS.find(p => p.id === values.type);
@@ -64,6 +67,30 @@ export default function SelectPlanStep() {
 
   const selectedBilling = form.values.billing;
 
+  // Moved planCards mapping outside the return for clarity and to use isMobile
+  const planCards = PLANS.map((planOption) => (
+    <UnstyledButton
+      key={planOption.id}
+      onClick={() => form.setFieldValue('type', planOption.id)}
+      className={classes.planCard}
+      data-active={form.values.type === planOption.id || undefined}
+      style={{
+        ...(isMobile ? { width: '100%' } : { flex: 1 }),
+      }}
+    >
+      <img src={planOption.icon} alt={`${planOption.name} icon`} className={classes.planIcon} />
+      <Box mt={isMobile ? 0 : 'auto'} style={{ flexGrow: 1, textAlign: 'left'}} >
+        <Text fw={500} style={{ color: 'hsl(213, 96%, 18%)' }}>{planOption.name}</Text>
+        <Text size="sm" style={{ color: 'hsl(231, 11%, 63%)' }}>
+          ${selectedBilling === 'yearly' ? `${planOption.priceYearly}/yr` : `${planOption.priceMonthly}/mo`}
+        </Text>
+        {selectedBilling === 'yearly' && (
+          <Text size="xs" style={{ color: 'hsl(213, 96%, 18%)' }}>2 months free</Text>
+        )}
+      </Box>
+    </UnstyledButton>
+  ));
+
   return (
     <Box component="form" onSubmit={form.onSubmit(handleSubmit)}>
       <Title order={2} mb="xs" style={{ color: 'hsl(213, 96%, 18%)', fontWeight: 700 }}>
@@ -73,33 +100,23 @@ export default function SelectPlanStep() {
         You have the option of monthly or yearly billing.
       </Text>
 
+      {/* Conditional rendering of Stack or Group based on isMobile */}
       <Stack gap="md">
-        <Group grow>
-          {PLANS.map((planOption) => (
-            <UnstyledButton
-              key={planOption.id}
-              onClick={() => form.setFieldValue('type', planOption.id)}
-              className={classes.planCard}
-              data-active={form.values.type === planOption.id || undefined}
-            >
-              <img src={planOption.icon} alt={`${planOption.name} icon`} className={classes.planIcon} />
-              <Box mt="md">
-                <Text fw={500} style={{ color: 'hsl(213, 96%, 18%)' }}>{planOption.name}</Text>
-                <Text size="sm" style={{ color: 'hsl(231, 11%, 63%)' }}>
-                  ${selectedBilling === 'yearly' ? `${planOption.priceYearly}/yr` : `${planOption.priceMonthly}/mo`}
-                </Text>
-                {selectedBilling === 'yearly' && (
-                  <Text size="xs" style={{ color: 'hsl(213, 96%, 18%)' }}>2 months free</Text>
-                )}
-              </Box>
-            </UnstyledButton>
-          ))}
-        </Group>
+        {isMobile ? (
+          <Stack gap="md">
+            {planCards}
+          </Stack>
+        ) : (
+          <Group grow gap="md" style={{ width: '100%' }}>
+            {planCards}
+          </Group>
+        )}
         {form.errors.type && (
           <Text size="xs" color="red" mt="xs">{form.errors.type}</Text>
         )}
       </Stack>
 
+      {/* Switch for monthly/yearly billing */}
       <Paper mt="xl" p="md" radius="md" withBorder style={{ backgroundColor: 'hsl(218, 100%, 97%)' }}>
         <Group justify="center" align="center">
           <Text fw={500} c={selectedBilling === 'monthly' ? 'hsl(213, 96%, 18%)' : 'hsl(231, 11%, 63%)'}>
@@ -117,6 +134,7 @@ export default function SelectPlanStep() {
         </Group>
       </Paper>
 
+      {/* Navigation buttons */}
       <Group justify="space-between" mt="xl">
         <Button variant="subtle" onClick={() => router.push('/form/your-info')}>
           Go Back
