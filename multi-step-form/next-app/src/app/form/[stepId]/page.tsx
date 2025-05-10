@@ -1,8 +1,8 @@
 // next-app/src/app/form/[stepId]/page.tsx
 import YourInfoStep from '@/components/form/YourInfoStep';
-const SelectPlanStep = () => <div>Pilih Paket Langganan</div>;
-const AddOnsStep = () => <div>Pilih Tambahan</div>;
-const SummaryStep = () => <div>Ringkasan Pesanan</div>;
+import SelectPlanStep from '@/components/form/SelectPlanStep';
+// const AddOnsStep = () => <div>Pilih Tambahan</div>;
+// const SummaryStep = () => <div>Ringkasan Pesanan</div>;
 
 export default function FormStepPage({ params }: { params: { stepId: string } }) {
   const { stepId } = params;
@@ -13,19 +13,20 @@ export default function FormStepPage({ params }: { params: { stepId: string } })
         return <YourInfoStep />;
       case 'select-plan':
         return <SelectPlanStep />;
-      case 'add-ons':
-        return <AddOnsStep />;
-      case 'summary':
-        return <SummaryStep />;
+      // case 'add-ons':
+      //   return <AddOnsStep />;
+      // case 'summary':
+      //   return <SummaryStep />;
       default:
-        return <div>Langkah tidak valid atau halaman utama form.</div>;
+        // This case might be hit if the stepId is not one of the above
+        // or if it's the base '/form' route (if you had one)
+        return <div>Invalid step or form home. Current step: {stepId}</div>;
     }
   };
 
   return (
-    <div>
+    <>
       {renderStepContent()}
-      {/* Navigation buttons will be added here later */}
-    </div>
+    </>
   );
 } 

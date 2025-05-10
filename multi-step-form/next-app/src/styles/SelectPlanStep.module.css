@@ -1,0 +1,27 @@
+/* next-app/src/styles/SelectPlanStep.module.css */
+.planCard {
+  border: 1px solid hsl(229, 24%, 87%); /* Cool gray */
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  display: flex;
+  flex-direction: column; /* Align icon and text vertically */
+  align-items: flex-start; /* Align items to the start */
+  min-height: 160px; /* Give some height */
+}
+
+.planCard:hover {
+  border-color: hsl(243, 100%, 62%); /* Purple */
+}
+
+.planCard[data-active] {
+  border-color: hsl(243, 100%, 62%); /* Purple */
+  background-color: hsl(218, 100%, 97%); /* Light Blue background */
+}
+
+.planIcon {
+  width: 40px; /* Or your desired size */
+  height: 40px; /* Or your desired size */
+  margin-bottom: 2.5rem; /* Space between icon and text, similar to design */
+} 
