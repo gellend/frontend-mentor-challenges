@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-import { Ubuntu } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import '@mantine/core/styles.css';
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 
-const ubuntu = Ubuntu({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ['400', '500', '700'],
-  variable: "--font-ubuntu",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -25,13 +29,8 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={ubuntu.variable}>
-        <MantineProvider theme={{
-          fontFamily: 'var(--font-ubuntu)',
-          headings: { fontFamily: 'var(--font-ubuntu)' }
-        }}>
-          {children}
-        </MantineProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <MantineProvider>{children}</MantineProvider>
       </body>
     </html>
   );
