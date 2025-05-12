@@ -10,6 +10,9 @@ import 'package:todo_app/widgets/todo_item_widget.dart';
 import 'package:todo_app/constants/text_styles.dart';
 // Import other necessary packages like TodoService, Todo model, TodoItemWidget later
 
+// Enum for filter states
+enum TodoFilter { all, active, completed }
+
 class TodoScreen extends StatefulWidget {
   const TodoScreen({
     super.key,
@@ -29,21 +32,13 @@ class _TodoScreenState extends State<TodoScreen> {
       TextEditingController(); // Controller for new todo input
 
   User? _currentUser;
-  // bool _isLoadingInitialTodos = true; // To handle initial loading state more explicitly if needed
+  TodoFilter _activeFilter = TodoFilter.all; // State for active filter
+  List<QueryDocumentSnapshot<Todo>> _allTodos = []; // To store all todos for client-side filtering
 
   @override
   void initState() {
     super.initState();
     _currentUser = _authService.currentUser;
-    // if (_currentUser != null) {
-    //   _todoService.getTodosStream(_currentUser!.uid).first.then((_) {
-    //     if (mounted) {
-    //       setState(() {
-    //         _isLoadingInitialTodos = false;
-    //       });
-    //     }
-    //   });
-    // }
   }
 
   @override
@@ -89,6 +84,41 @@ class _TodoScreenState extends State<TodoScreen> {
         );
       }
     }
+  }
+
+  // Helper to filter todos based on _activeFilter
+  List<QueryDocumentSnapshot<Todo>> _getFilteredTodos() {
+    if (_activeFilter == TodoFilter.active) {
+      return _allTodos.where((doc) => !doc.data().isCompleted).toList();
+    }
+    if (_activeFilter == TodoFilter.completed) {
+      return _allTodos.where((doc) => doc.data().isCompleted).toList();
+    }
+    return _allTodos; // TodoFilter.all
+  }
+
+  int _getActiveItemsCount() {
+    return _allTodos.where((doc) => !doc.data().isCompleted).length;
+  }
+
+  Widget _buildFilterButton(BuildContext context, TodoFilter filter, String text) {
+    final theme = Theme.of(context);
+    final bool isActive = _activeFilter == filter;
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          _activeFilter = filter;
+        });
+      },
+      child: Text(
+        text,
+        style: bodyTextStyle.copyWith(
+          fontSize: 14,
+          color: isActive ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+    );
   }
 
   @override
@@ -178,13 +208,7 @@ class _TodoScreenState extends State<TodoScreen> {
                     : StreamBuilder<QuerySnapshot<Todo>>(
                       stream: _todoService.getTodosStream(_currentUser!.uid),
                       builder: (context, snapshot) {
-                        // Handle initial loading explicitly if stream is slow to emit first value
-                        // if (_isLoadingInitialTodos && snapshot.connectionState == ConnectionState.waiting) {
-                        //   return const Center(child: CircularProgressIndicator());
-                        // }
-
                         if (snapshot.hasError) {
-                          // if (_isLoadingInitialTodos && mounted) setState(() => _isLoadingInitialTodos = false);
                           return Center(
                             child: Padding(
                               padding: const EdgeInsets.all(
@@ -195,25 +219,34 @@ class _TodoScreenState extends State<TodoScreen> {
                           );
                         }
 
-                        // Important: Check for ConnectionState.waiting AFTER checking for error
-                        // This ensures that an error state is shown even if waiting for new data.
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          // Only show loading if there's no data yet (first load)
-                          // or if specifically desired during re-fetches (less common for Firestore streams)
                           if (!snapshot.hasData ||
                               snapshot.data!.docs.isEmpty) {
-                            // Check if _isLoadingInitialTodos is true if you use that flag
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
                           }
-                          // If we have data already, just show the list while waiting for update
                         }
 
-                        // if (_isLoadingInitialTodos && mounted) setState(() => _isLoadingInitialTodos = false);
+                        if (snapshot.hasData) {
+                          _allTodos = snapshot.data!.docs;
+                        } else {
+                          _allTodos = []; // Ensure _allTodos is empty if no data
+                        }
 
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        final filteredTodos = _getFilteredTodos();
+
+                        if (filteredTodos.isEmpty && _allTodos.isNotEmpty && _activeFilter != TodoFilter.all) {
+                          return Center(
+                            child: Text(
+                              'No todos match this filter.',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          );
+                        } else if (_allTodos.isEmpty) {
                           return Center(
                             child: Text(
                               'No todos yet. Add some!',
@@ -224,17 +257,15 @@ class _TodoScreenState extends State<TodoScreen> {
                           );
                         }
 
-                        final todos = snapshot.data!.docs;
-
                         return ListView.builder(
                           padding: const EdgeInsets.only(
                             top: 8.0,
                             bottom: 16.0,
                           ), // Padding for the list
-                          itemCount: todos.length,
+                          itemCount: filteredTodos.length,
                           itemBuilder: (context, index) {
-                            final todo = todos[index].data();
-                            final todoId = todos[index].id;
+                            final todo = filteredTodos[index].data();
+                            final todoId = filteredTodos[index].id;
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal padding to list items
                               child: TodoItemWidget(
@@ -258,7 +289,47 @@ class _TodoScreenState extends State<TodoScreen> {
                       },
                     ),
           ),
-          // TODO: Add filter and clear completed buttons area if needed based on design
+          // Filter and Clear Actions Bar
+          if (_currentUser != null) // Only show if user is logged in
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface, // Or theme.cardColor
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2), // Shadow on top
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    '${_getActiveItemsCount()} items left',
+                    style: bodyTextStyle.copyWith(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      _buildFilterButton(context, TodoFilter.all, 'All'),
+                      _buildFilterButton(context, TodoFilter.active, 'Active'),
+                      _buildFilterButton(context, TodoFilter.completed, 'Completed'),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // Optional: Add confirmation dialog
+                      await _todoService.clearCompletedTodos(_currentUser!.uid);
+                    },
+                    child: Text(
+                      'Clear Completed',
+                      style: bodyTextStyle.copyWith(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
       // floatingActionButton: FloatingActionButton( // Consider if FAB is still the best UX for adding todos
