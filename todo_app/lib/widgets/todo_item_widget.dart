@@ -36,10 +36,6 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
         ? (isDarkMode ? darkDarkGrayishBlue : lightDarkGrayishBlue)
         : (isDarkMode ? darkLightGrayishBlue : theme.colorScheme.onSurface);
     
-    Color circleColor = widget.todo.isCompleted 
-        ? Colors.transparent // No fill when completed, gradient border will show
-        : (isDarkMode ? darkVeryDarkDesaturatedBlue : lightVeryLightGrayishBlue); // inner circle color when not completed
-
     bool showInteractiveElements = !isDesktop || (isDesktop && _isHovered);
 
     return MouseRegion(
@@ -61,12 +57,14 @@ class _TodoItemWidgetState extends State<TodoItemWidget> {
                     shape: BoxShape.circle,
                     gradient: widget.todo.isCompleted 
                       ? const LinearGradient(
-                          colors: [gradientStart, gradientEnd],
+                          colors: [gradientStart, gradientEnd], // Original colors restored
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ) 
-                      : null, // No gradient if not completed
-                    color: circleColor, // Inner circle color when not completed or transparent for gradient
+                      : null,
+                    color: widget.todo.isCompleted 
+                        ? null // Set color to null when gradient is active
+                        : (isDarkMode ? darkVeryDarkDesaturatedBlue : lightVeryLightGrayishBlue), // Solid color when not completed
                     border: Border.all(
                       color: widget.todo.isCompleted 
                         ? Colors.transparent // No border when gradient is shown

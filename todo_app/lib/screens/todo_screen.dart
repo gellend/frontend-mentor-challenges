@@ -32,12 +32,12 @@ class _TodoScreenState extends State<TodoScreen> {
 
   User? _currentUser;
   TodoFilter _activeFilter = TodoFilter.all; // State for active filter
-  List<QueryDocumentSnapshot<Todo>> _allTodos = []; // To store all todos for client-side filtering
+  List<QueryDocumentSnapshot<Todo>> _allTodos = []; // Make _allTodos non-final
 
   // Define header heights
   final double _mobileHeaderHeight = 200.0;
   final double _desktopHeaderHeight = 300.0;
-  final double _inputCardOverlap = 50.0; // How much the input card should visually overlap the header bottom
+  // final double _inputCardOverlap = 100.0; // Adjusted overlap
 
   @override
   void initState() {
@@ -192,8 +192,13 @@ class _TodoScreenState extends State<TodoScreen> {
     final isDesktop = screenWidth > 700; // Adjusted breakpoint for more distinct desktop view
 
     final double headerHeight = isDesktop ? _desktopHeaderHeight : _mobileHeaderHeight;
-    // Calculate padding for the main content area to position input field correctly
-    final double mainContentPaddingTop = headerHeight - _inputCardOverlap;
+    
+    // Padding from the top of the screen to the start of the "TODO" title row
+    final double titleRowTopPadding = isDesktop ? 70.0 : 50.0; 
+    // Space between "TODO" title row and the TextField
+    final double spaceBetweenTitleAndInput = isDesktop ? 35.0 : 25.0; 
+    // Space between TextField and the Todo List card
+    final double spaceBetweenInputAndList = 24.0;
 
     String backgroundImage;
     if (themeProvider.isDarkMode) {
@@ -210,211 +215,243 @@ class _TodoScreenState extends State<TodoScreen> {
             top: 0,
             left: 0,
             right: 0,
-            height: headerHeight,
+            height: headerHeight, // This is for the background image
             child: Image.asset(
               backgroundImage,
               fit: BoxFit.cover,
             ),
           ),
 
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AppBar(
-              title: Text(widget.title, style: theme.textTheme.titleLarge?.copyWith(color: Colors.white, letterSpacing: isDesktop ? 8 : 4)), // Added letter spacing for TODO title
-              backgroundColor: Colors.transparent, 
-              elevation: 0, 
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    themeProvider.isDarkMode ? Icons.wb_sunny_outlined : Icons.nightlight_round_outlined,
-                    color: Colors.white, 
-                  ),
-                  onPressed: () {
-                    themeProvider.toggleTheme(!themeProvider.isDarkMode);
-                  },
-                  tooltip: themeProvider.isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  onPressed: () async {
-                    await _authService.signOut();
-                  },
-                  tooltip: 'Logout',
-                ),
-              ],
-            ),
-          ),
+          // Removed the old Positioned AppBar here
 
+          // This Padding positions the main content column (Title, Input, List)
           Padding(
-            padding: EdgeInsets.only(top: mainContentPaddingTop > 0 ? mainContentPaddingTop : 0), 
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  // Horizontal padding for the input card and list items
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Material(
-                    elevation: 6.0, // Slightly increased elevation for more depth
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: theme.colorScheme.surface, // Background for the input field card area
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), // Padding inside the card for the textfield
-                      child: TextField(
-                        controller: _newTodoController,
-                        decoration: InputDecoration(
-                          hintText: 'Create a new todo...', // Updated hint
-                          hintStyle: bodyTextStyle.copyWith(fontSize: 16, color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8)),
-                          border: InputBorder.none, // No border inside the card
-                        ),
-                        style: bodyTextStyle.copyWith(fontSize: 16, color: theme.colorScheme.onSurface),
-                        onSubmitted: (value) => _addTodoItem(),
+            padding: EdgeInsets.only(
+              top: titleRowTopPadding,
+              bottom: isDesktop ? 24.0 : 0.0, // Add bottom padding for desktop/tablet
+            ), 
+            child: Center( 
+              child: ConstrainedBox( 
+                constraints: const BoxConstraints(maxWidth: 550), 
+                child: Column(
+                  children: <Widget>[
+                    // 1. New Header Row (TODO Title and Theme Icon)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0), // Match horizontal padding of items below
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "TODO",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isDesktop ? 40 : 32,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: isDesktop ? 15 : 10,
+                            ),
+                          ),
+                          Row( // Group action icons
+                            mainAxisSize: MainAxisSize.min, // So the row doesn't expand unnecessarily
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  themeProvider.isDarkMode ? Icons.wb_sunny_outlined : Icons.nightlight_round_outlined,
+                                  color: Colors.white,
+                                  size: isDesktop ? 30 : 26,
+                                ),
+                                onPressed: () {
+                                  themeProvider.toggleTheme(!themeProvider.isDarkMode);
+                                },
+                                tooltip: themeProvider.isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                              ),
+                              SizedBox(width: isDesktop ? 8 : 4), // Spacing between icons
+                              IconButton(
+                                icon: Icon(Icons.logout, color: Colors.white, size: isDesktop ? 30 : 26),
+                                onPressed: () async {
+                                  await _authService.signOut();
+                                  // Optionally navigate to AuthScreen if not handled by StreamBuilder in main.dart
+                                  // For example, if you want an immediate navigation without waiting for stream update:
+                                  // if (mounted) Navigator.of(context).pushReplacementNamed('/auth'); 
+                                },
+                                tooltip: 'Logout',
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 24), // Space between input card and list/filter card
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Material(
-                       elevation: 6.0,
-                       borderRadius: BorderRadius.circular(8.0),
-                       color: theme.colorScheme.surface,
-                       clipBehavior: Clip.antiAlias, // Ensures ListView respects border radius
-                       child: _currentUser == null
-                          ? const Center(child: Text('User not logged in.')) 
-                          : StreamBuilder<QuerySnapshot<Todo>>(
-                              stream: _todoService.getTodosStream(_currentUser!.uid),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return Center(child: Padding(padding: const EdgeInsets.all(16.0), child: SelectableText('Error: ${snapshot.error}')));
-                                }
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                     return const Center(child: CircularProgressIndicator());
-                                  }
-                                }
-                                if (snapshot.hasData) {
-                                  _allTodos = snapshot.data!.docs;
-                                } else {
-                                  _allTodos = [];
-                                }
-                                final filteredTodos = _getFilteredTodos();
-                                if (_allTodos.isEmpty) { // Simplified condition for empty list
-                                  return Center(child: Text('No todos yet. Add some!', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)));
-                                }
-                                // If filter results in empty but there are todos, show different message or just empty list
-                                // For now, ListView will handle empty filteredTodos by showing nothing if itemCount is 0.
+                    
+                    SizedBox(height: spaceBetweenTitleAndInput),
 
-                                return Column(
-                                  children: [
-                                    Expanded(
-                                      child: ReorderableListView.builder(
-                                        buildDefaultDragHandles: false,
-                                        padding: const EdgeInsets.only(top:8.0),
-                                        itemCount: filteredTodos.length,
-                                        itemBuilder: (context, index) {
-                                          final todoDoc = filteredTodos[index];
-                                          final todo = todoDoc.data();
-                                          final todoId = todoDoc.id;
-                                          return Column(
-                                            key: ValueKey(todoId), // Important for ReorderableListView
-                                            children: [
-                                              TodoItemWidget(
-                                                todo: todo,
-                                                itemIndex: index,
-                                                onStatusChanged: (isCompleted) {
-                                                  if (isCompleted != null) {
-                                                    _todoService.updateTodoStatus(todoId, isCompleted);
+                    // 2. New Todo Input TextField
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0), // Match horizontal padding
+                      child: Material(
+                        elevation: 6.0,
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: theme.colorScheme.surface, 
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0), // Main padding for the Row, adjust as needed
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _newTodoController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Create a new todo...',
+                                    hintStyle: bodyTextStyle.copyWith(
+                                      fontSize: isDesktop ? 18 : 16, 
+                                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7)
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: isDesktop ? 20.0 : 18.0,
+                                      horizontal: 20.0 // Added horizontal padding for the text start
+                                    ), 
+                                  ),
+                                  style: bodyTextStyle.copyWith(
+                                    fontSize: isDesktop ? 18 : 16, 
+                                    color: theme.colorScheme.onSurface
+                                  ),
+                                  onSubmitted: (value) => _addTodoItem(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    SizedBox(height: spaceBetweenInputAndList),
+
+                    // 3. Existing Todo List and Filters
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0), // This padding is for the card itself
+                        child: Material(
+                           elevation: 6.0,
+                           borderRadius: BorderRadius.circular(8.0),
+                           color: theme.colorScheme.surface,
+                           clipBehavior: Clip.antiAlias, 
+                           child: _currentUser == null
+                              ? const Center(child: Text('User not logged in.')) 
+                              : StreamBuilder<QuerySnapshot<Todo>>(
+                                  stream: _todoService.getTodosStream(_currentUser!.uid),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Center(child: Padding(padding: const EdgeInsets.all(16.0), child: SelectableText('Error: ${snapshot.error}')));
+                                    }
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      if (_allTodos.isEmpty) { 
+                                         return const Center(child: CircularProgressIndicator());
+                                      }
+                                    }
+                                    if (snapshot.hasData) {
+                                      _allTodos = snapshot.data!.docs; 
+                                    } else if (snapshot.connectionState != ConnectionState.waiting) {
+                                      _allTodos = [];
+                                    }
+                                    
+                                    final filteredTodos = _getFilteredTodos(); 
+
+                                    if (_allTodos.isEmpty && snapshot.connectionState != ConnectionState.waiting) {
+                                      return Center(child: Text('No todos yet. Add some!', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)));
+                                    }
+                                    
+                                    return Column(
+                                      children: [
+                                        Expanded(
+                                          child: ReorderableListView.builder(
+                                            buildDefaultDragHandles: false, 
+                                            padding: const EdgeInsets.only(top:8.0),
+                                            itemCount: filteredTodos.length,
+                                            itemBuilder: (context, index) {
+                                              final todoDoc = filteredTodos[index];
+                                              final todo = todoDoc.data(); 
+                                              final todoId = todoDoc.id;
+
+                                              return Column(
+                                                key: ValueKey(todoId), 
+                                                children: [
+                                                  TodoItemWidget(
+                                                    todo: todo,
+                                                    itemIndex: index, 
+                                                    onStatusChanged: (isCompleted) {
+                                                      if (isCompleted != null) {
+                                                        _todoService.updateTodoStatus(todoId, isCompleted);
+                                                      }
+                                                    },
+                                                    onDelete: () {
+                                                      _todoService.deleteTodo(todoId);
+                                                    },
+                                                  ),
+                                                  if (index < filteredTodos.length - 1) 
+                                                    Divider(
+                                                      height: 1, 
+                                                      thickness: 1, 
+                                                      color: theme.dividerColor.withOpacity(0.5),
+                                                      indent: 20, 
+                                                      endIndent: 20, 
+                                                    ),
+                                                ],
+                                              );
+                                            },
+                                            onReorder: _onReorder, 
+                                          ),
+                                        ),
+                                        // Filter and Clear Actions Bar (Inside the Material card)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0), // Adjusted padding
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Text('${_getActiveItemsCount()} items left', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                                              if (isDesktop) // Show row of filters only on desktop
+                                                Row(
+                                                  children: <Widget>[
+                                                    _buildFilterButton(context, TodoFilter.all, 'All'),
+                                                    _buildFilterButton(context, TodoFilter.active, 'Active'),
+                                                    _buildFilterButton(context, TodoFilter.completed, 'Completed'),
+                                                  ],
+                                                ),
+                                              TextButton(
+                                                style: TextButton.styleFrom(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                                  minimumSize: Size.zero,
+                                                ),
+                                                onPressed: () async { 
+                                                  if (_currentUser != null) {
+                                                    await _todoService.clearCompletedTodos(_currentUser!.uid);
                                                   }
                                                 },
-                                                onDelete: () {_todoService.deleteTodo(todoId);},
+                                                child: Text('Clear Completed', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                                               ),
-                                              if (index < filteredTodos.length - 1) // Add divider except for the last item
-                                                Divider(
-                                                  height: 1, 
-                                                  thickness: 1, 
-                                                  color: theme.dividerColor.withOpacity(0.5),
-                                                  indent: 20, // Match TodoItemWidget horizontal padding
-                                                  endIndent: 20, // Match TodoItemWidget horizontal padding
-                                                ),
                                             ],
-                                          );
-                                        },
-                                        onReorder: _onReorder,
-                                      ),
-                                    ),
-                                    // Filter and Clear Actions Bar (Now inside the Material card)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text('${_getActiveItemsCount()} items left', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                                          // Responsive filter buttons for Desktop
-                                          if (isDesktop)
-                                            Row(
-                                              children: <Widget>[
-                                                _buildFilterButton(context, TodoFilter.all, 'All'),
-                                                _buildFilterButton(context, TodoFilter.active, 'Active'),
-                                                _buildFilterButton(context, TodoFilter.completed, 'Completed'),
-                                              ],
-                                            ),
-                                          TextButton(
-                                            style: TextButton.styleFrom(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                              minimumSize: Size.zero,
-                                            ),
-                                            onPressed: () async { 
-                                              if (_currentUser != null) {
-                                                await _todoService.clearCompletedTodos(_currentUser!.uid);
-                                              }
-                                            },
-                                            child: Text('Clear Completed', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                                           ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                );
-                              },
-                            ),
-                    ),
-                  ),
-                ),
-                // Mobile specific filter bar (shown below the main list card)
-                if (!isDesktop)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0), // Add padding: top 16, bottom 0
-                    child: Material(
-                      elevation: 6.0,
-                      borderRadius: BorderRadius.circular(8.0),
-                      color: theme.colorScheme.surface,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0), // Padding inside the mobile filter card
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            _buildFilterButton(context, TodoFilter.all, 'All'),
-                            _buildFilterButton(context, TodoFilter.active, 'Active'),
-                            _buildFilterButton(context, TodoFilter.completed, 'Completed'),
-                          ],
+                                        )
+                                      ],
+                                    );
+                                  },
+                                ),
                         ),
                       ),
                     ),
-                  ),
-                // Drag and drop hint text
-                if (_allTodos.isNotEmpty) // Show hint only if there are todos
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                    child: Text(
-                      'Drag and drop to reorder list',
-                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    // Mobile specific filter bar (shown below the main list card if not desktop)
+                    if (!isDesktop)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildFilterButton(context, TodoFilter.all, 'All'),
+                          _buildFilterButton(context, TodoFilter.active, 'Active'),
+                          _buildFilterButton(context, TodoFilter.completed, 'Completed'),
+                        ],
+                      ),
                     ),
-                  ),
-                 const SizedBox(height: 20), // Adjusted bottom padding
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ],
