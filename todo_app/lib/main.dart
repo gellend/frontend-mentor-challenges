@@ -10,8 +10,6 @@ import 'package:todo_app/screens/auth_screen.dart';
 import 'package:todo_app/screens/todo_screen.dart';
 import 'package:todo_app/services/auth_service.dart';
 
-// Your web app's Firebase configuration
-// These values will be used for Firebase initialization on the web.
 const FirebaseOptions firebaseOptions = FirebaseOptions(
   apiKey: "AIzaSyAnFrbkF9Yturi-ogSQaXOTFO2YBcZkSwc",
   authDomain: "todo-app-gellend.firebaseapp.com",
@@ -42,7 +40,6 @@ class MyApp extends StatelessWidget {
 
   MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);

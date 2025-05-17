@@ -13,19 +13,29 @@ class TodoService {
         );
   }
 
-  // Get a stream of todos for a specific user
+  // Get a stream of todos for a specific user, ordered by orderIndex
   Stream<QuerySnapshot<Todo>> getTodosStream(String userId) {
-    return _todosRef.where('userId', isEqualTo: userId).orderBy('createdAt', descending: true).snapshots();
+    return _todosRef
+        .where('userId', isEqualTo: userId)
+        .orderBy('orderIndex', descending: false) // Order by orderIndex ascending
+        .snapshots();
   }
 
   // Add a new todo
   Future<void> addTodo(String userId, String text) async {
     try {
+      // Get the current count of todos for the user to determine the next orderIndex
+      final QuerySnapshot<Todo> userTodosSnapshot = await _todosRef
+          .where('userId', isEqualTo: userId)
+          .get();
+      final int nextOrderIndex = userTodosSnapshot.docs.length;
+
       await _todosRef.add(
         Todo(
           userId: userId,
           text: text,
-          createdAt: Timestamp.now(), // Firestore server timestamp can also be used
+          createdAt: Timestamp.now(), 
+          orderIndex: nextOrderIndex, // Set the orderIndex
         ),
       );
     } catch (e) {
@@ -70,6 +80,22 @@ class TodoService {
       await batch.commit();
     } catch (e) {
       print('Error clearing completed todos: $e');
+      rethrow;
+    }
+  }
+
+  // Update the order of todos
+  Future<void> updateTodoOrder(List<DocumentSnapshot<Todo>> todosInNewOrder) async {
+    if (todosInNewOrder.isEmpty) return;
+    try {
+      final WriteBatch batch = _firestore.batch();
+      for (int i = 0; i < todosInNewOrder.length; i++) {
+        final DocumentReference docRef = todosInNewOrder[i].reference;
+        batch.update(docRef, {'orderIndex': i});
+      }
+      await batch.commit();
+    } catch (e) {
+      print('Error updating todo order: $e');
       rethrow;
     }
   }

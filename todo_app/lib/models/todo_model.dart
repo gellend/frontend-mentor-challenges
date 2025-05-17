@@ -6,6 +6,7 @@ class Todo {
   final String text;
   final bool isCompleted;
   final Timestamp createdAt;
+  final int orderIndex; 
 
   Todo({
     this.id,
@@ -13,6 +14,7 @@ class Todo {
     required this.text,
     this.isCompleted = false, // Default to not completed
     required this.createdAt,
+    required this.orderIndex,
   });
 
   // Factory constructor to create a Todo from a Firestore DocumentSnapshot
@@ -24,6 +26,7 @@ class Todo {
       text: data['text'] as String,
       isCompleted: data['isCompleted'] as bool,
       createdAt: data['createdAt'] as Timestamp,
+      orderIndex: data['orderIndex'] as int? ?? 0, // Default to 0 if null, though should be set
     );
   }
 
@@ -34,6 +37,7 @@ class Todo {
       'text': text,
       'isCompleted': isCompleted,
       'createdAt': createdAt,
+      'orderIndex': orderIndex,
     };
   }
 
@@ -44,6 +48,7 @@ class Todo {
     String? text,
     bool? isCompleted,
     Timestamp? createdAt,
+    int? orderIndex,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -51,6 +56,7 @@ class Todo {
       text: text ?? this.text,
       isCompleted: isCompleted ?? this.isCompleted,
       createdAt: createdAt ?? this.createdAt,
+      orderIndex: orderIndex ?? this.orderIndex,
     );
   }
 } 

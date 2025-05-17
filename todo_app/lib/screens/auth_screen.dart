@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/services/auth_service.dart';
 import 'package:todo_app/constants/text_styles.dart';
-// import 'package:todo_app/constants/colors.dart'; // Colors will be used via Theme
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -43,19 +42,11 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        // Navigation will be handled by the StreamBuilder in main.dart
       } else {
         await _authService.signUpWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        // Navigation will be handled by the StreamBuilder in main.dart
-        // Or, optionally, you could switch to login mode here
-        // if (_authService.currentUser != null) { // Check if signup was successful
-        //   setState(() {
-        //     _isLoginMode = true;
-        //   });
-        // }
       }
     } catch (error) {
       // Error is already printed in AuthService, but we can show a SnackBar here
@@ -82,12 +73,6 @@ class _AuthScreenState extends State<AuthScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(_isLoginMode ? 'Login' : 'Sign Up', style: theme.textTheme.titleMedium),
-      //   backgroundColor: theme.colorScheme.surface, // Use a color that fits the theme for appbar
-      //   elevation: 0, // Flat appbar for a cleaner look, if desired
-      // ),
-      // Using a simple centered layout for now without an AppBar, closer to some modern auth screens
       body: Center(
         // Add ConstrainedBox to limit the width on larger screens
         child: ConstrainedBox(
@@ -140,7 +125,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       labelText: 'Password',
                       prefixIcon: Icon(Icons.lock_outline, color: theme.colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                      // TODO: Add suffix icon for password visibility toggle
                     ),
                     style: bodyTextStyle.copyWith(color: theme.colorScheme.onSurface),
                     obscureText: true,

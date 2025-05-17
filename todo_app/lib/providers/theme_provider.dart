@@ -12,9 +12,4 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // // Alternative toggle if you just want to switch between light and dark
-  // void simpleToggleTheme() {
-  //   _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-  //   notifyListeners();
-  // }
 } 
