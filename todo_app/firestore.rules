@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Todos collection
+    match /todos/{todoId} {
+      // Allow create if the new todo's userId matches the requester's uid
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Allow read, update, delete if the requester's uid matches the todo's userId
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // You might have other collections in the future, define their rules here.
+    // For example, if you have a 'users' collection to store user profiles:
+    // match /users/{userId} {
+    //   allow read: if true; // Anyone can read user profiles (adjust as needed)
+    //   allow write: if request.auth != null && request.auth.uid == userId; // Only the user can write to their own profile
+    // }
+  }
+}
