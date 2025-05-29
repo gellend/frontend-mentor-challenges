@@ -50,11 +50,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initializationFuture = _initializeApp();
   }
 
-  Future<void> _initializeApp() async {
-    final todoProvider = Provider.of<TodoServiceProvider>(context, listen: false);
+  Future<void> _initializeApp(TodoServiceProvider todoProvider) async {
     final authService = AuthService();
     
     // Initialize storage based on current auth state
@@ -120,22 +118,29 @@ class _MyAppState extends State<MyApp> {
           headlineSmall: bodyTextStyleBold.copyWith(fontSize: 24.0, color: darkLightGrayishBlue),
         ),
       ),
-      home: FutureBuilder<void>(
-        future: _initializationFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
+      home: Consumer<TodoServiceProvider>(
+        builder: (context, todoProvider, child) {
+          // Only create the future once
+          _initializationFuture ??= _initializeApp(todoProvider);
           
-          if (snapshot.hasError) {
-            return Scaffold(
-              body: Center(child: Text('Error: ${snapshot.error}')),
-            );
-          }
-          
-          return const TodoScreen(title: 'TODO');
+          return FutureBuilder<void>(
+            future: _initializationFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              
+              if (snapshot.hasError) {
+                return Scaffold(
+                  body: Center(child: Text('Error: ${snapshot.error}')),
+                );
+              }
+              
+              return const TodoScreen(title: 'TODO');
+            },
+          );
         },
       ),
     );
