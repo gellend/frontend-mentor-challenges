@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -20,7 +21,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       // Handle errors (e.g., email-already-in-use, weak-password)
       // For now, just print the error. We can implement better error handling later.
-      print('FirebaseAuthException on SignUp: ${e.message}');
+      debugPrint('FirebaseAuthException on SignUp: ${e.message}');
       return null;
     }
   }
@@ -35,7 +36,7 @@ class AuthService {
       );
     } on FirebaseAuthException catch (e) {
       // Handle errors (e.g., user-not-found, wrong-password)
-      print('FirebaseAuthException on SignIn: ${e.message}');
+      debugPrint('FirebaseAuthException on SignIn: ${e.message}');
       return null;
     }
   }

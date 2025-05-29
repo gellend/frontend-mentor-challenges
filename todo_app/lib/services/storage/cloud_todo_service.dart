@@ -1,28 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:todo_app/models/todo_model.dart';
+import 'package:todo_app/services/storage/todo_storage_interface.dart';
 
-class TodoService {
+class CloudTodoService implements TodoStorageInterface {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // Note: Collection name can be stored in a constant file later
+  final String userId;
   late final CollectionReference<Todo> _todosRef;
 
-  TodoService() {
+  CloudTodoService({required this.userId}) {
     _todosRef = _firestore.collection('todos').withConverter<Todo>(
           fromFirestore: (snapshots, _) => Todo.fromFirestore(snapshots),
           toFirestore: (todo, _) => todo.toFirestore(),
         );
   }
 
-  // Get a stream of todos for a specific user, ordered by orderIndex
-  Stream<QuerySnapshot<Todo>> getTodosStream(String userId) {
+  @override
+  Stream<List<Todo>> getTodosStream() {
     return _todosRef
         .where('userId', isEqualTo: userId)
-        .orderBy('orderIndex', descending: false) // Order by orderIndex ascending
-        .snapshots();
+        .orderBy('orderIndex', descending: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  // Add a new todo
-  Future<void> addTodo(String userId, String text) async {
+  @override
+  Future<void> addTodo(String text) async {
     try {
       // Get the current count of todos for the user to determine the next orderIndex
       final QuerySnapshot<Todo> userTodosSnapshot = await _todosRef
@@ -35,38 +38,37 @@ class TodoService {
           userId: userId,
           text: text,
           createdAt: Timestamp.now(), 
-          orderIndex: nextOrderIndex, // Set the orderIndex
+          orderIndex: nextOrderIndex,
         ),
       );
     } catch (e) {
-      // Handle error (e.g., log it, show a message)
-      print('Error adding todo: $e');
-      rethrow; // Rethrow to allow UI to handle it if needed
+      debugPrint('Error adding todo: $e');
+      rethrow;
     }
   }
 
-  // Update a todo's completion status
+  @override
   Future<void> updateTodoStatus(String todoId, bool isCompleted) async {
     try {
       await _todosRef.doc(todoId).update({'isCompleted': isCompleted});
     } catch (e) {
-      print('Error updating todo status: $e');
+      debugPrint('Error updating todo status: $e');
       rethrow;
     }
   }
 
-  // Delete a todo
+  @override
   Future<void> deleteTodo(String todoId) async {
     try {
       await _todosRef.doc(todoId).delete();
     } catch (e) {
-      print('Error deleting todo: $e');
+      debugPrint('Error deleting todo: $e');
       rethrow;
     }
   }
   
-  // Clear all completed todos for a user
-  Future<void> clearCompletedTodos(String userId) async {
+  @override
+  Future<void> clearCompletedTodos() async {
     try {
       final WriteBatch batch = _firestore.batch();
       final QuerySnapshot<Todo> completedTodosSnapshot = await _todosRef
@@ -79,24 +81,32 @@ class TodoService {
       }
       await batch.commit();
     } catch (e) {
-      print('Error clearing completed todos: $e');
+      debugPrint('Error clearing completed todos: $e');
       rethrow;
     }
   }
 
-  // Update the order of todos
-  Future<void> updateTodoOrder(List<DocumentSnapshot<Todo>> todosInNewOrder) async {
-    if (todosInNewOrder.isEmpty) return;
+  @override
+  Future<void> updateTodoOrder(List<Todo> todos) async {
+    if (todos.isEmpty) return;
     try {
       final WriteBatch batch = _firestore.batch();
-      for (int i = 0; i < todosInNewOrder.length; i++) {
-        final DocumentReference docRef = todosInNewOrder[i].reference;
-        batch.update(docRef, {'orderIndex': i});
+      for (int i = 0; i < todos.length; i++) {
+        final Todo todo = todos[i];
+        if (todo.id != null) {
+          final DocumentReference docRef = _todosRef.doc(todo.id);
+          batch.update(docRef, {'orderIndex': i});
+        }
       }
       await batch.commit();
     } catch (e) {
-      print('Error updating todo order: $e');
+      debugPrint('Error updating todo order: $e');
       rethrow;
     }
+  }
+
+  @override
+  Future<void> dispose() async {
+    // No cleanup needed for cloud service
   }
 } 

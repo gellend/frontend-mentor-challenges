@@ -30,6 +30,18 @@ class Todo {
     );
   }
 
+  // Factory constructor to create a Todo from JSON (for local storage)
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(
+      id: json['id'] as String?,
+      userId: json['userId'] as String,
+      text: json['text'] as String,
+      isCompleted: json['isCompleted'] as bool,
+      createdAt: Timestamp.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      orderIndex: json['orderIndex'] as int? ?? 0,
+    );
+  }
+
   // Method to convert a Todo instance to a Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
@@ -37,6 +49,18 @@ class Todo {
       'text': text,
       'isCompleted': isCompleted,
       'createdAt': createdAt,
+      'orderIndex': orderIndex,
+    };
+  }
+
+  // Method to convert a Todo instance to JSON (for local storage)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'text': text,
+      'isCompleted': isCompleted,
+      'createdAt': createdAt.millisecondsSinceEpoch,
       'orderIndex': orderIndex,
     };
   }

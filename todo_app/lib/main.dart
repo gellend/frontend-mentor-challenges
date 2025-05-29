@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/constants/text_styles.dart';
 import 'package:todo_app/providers/theme_provider.dart';
-import 'package:todo_app/screens/auth_screen.dart';
+import 'package:todo_app/providers/todo_service_provider.dart';
 import 'package:todo_app/screens/todo_screen.dart';
 import 'package:todo_app/services/auth_service.dart';
 
@@ -28,17 +27,44 @@ void main() async {
     await Firebase.initializeApp();
   }
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => TodoServiceProvider()),
+      ],
       child: MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  final AuthService _authService = AuthService();
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  MyApp({super.key});
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Future<void>? _initializationFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializationFuture = _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    final todoProvider = Provider.of<TodoServiceProvider>(context, listen: false);
+    final authService = AuthService();
+    
+    // Initialize storage based on current auth state
+    final currentUser = authService.currentUser;
+    if (currentUser != null) {
+      await todoProvider.switchToCloud(currentUser.uid);
+    } else {
+      await todoProvider.initializeLocal();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,21 +120,22 @@ class MyApp extends StatelessWidget {
           headlineSmall: bodyTextStyleBold.copyWith(fontSize: 24.0, color: darkLightGrayishBlue),
         ),
       ),
-      home: StreamBuilder<User?>(
-        stream: _authService.authStateChanges,
+      home: FutureBuilder<void>(
+        future: _initializationFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             );
           }
-          if (snapshot.hasData && snapshot.data != null) {
-            return const TodoScreen(title: 'TODO');
-          } else {
-            return const AuthScreen();
+          
+          if (snapshot.hasError) {
+            return Scaffold(
+              body: Center(child: Text('Error: ${snapshot.error}')),
+            );
           }
+          
+          return const TodoScreen(title: 'TODO');
         },
       ),
     );

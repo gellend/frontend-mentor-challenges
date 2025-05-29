@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/services/auth_service.dart';
 import 'package:todo_app/constants/text_styles.dart';
+import 'package:todo_app/screens/todo_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -48,6 +49,16 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _passwordController.text.trim(),
         );
       }
+      
+      // Add navigation after successful authentication
+      if (mounted) {
+        // Navigate to TodoScreen and remove all previous routes
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const TodoScreen(title: 'TODO')),
+          (route) => false,
+        );
+      }
+      
     } catch (error) {
       // Error is already printed in AuthService, but we can show a SnackBar here
       String errorMessage = 'Authentication failed. Please try again.';
